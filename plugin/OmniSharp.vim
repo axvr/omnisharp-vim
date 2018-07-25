@@ -9,6 +9,12 @@ if !(has('python') || has('python3'))
   finish
 endif
 
+let s:default_server_path = expand($HOME.'/.omnisharp/vim/run')
+if has('win32') || has('win32unix')
+    let s:default_server_path = expand($HOME.'/.omnisharp/vim/OmniSharp.exe')
+endif
+let g:OmniSharp_server_path = get(g:, 'OmniSharp_server_path', s:default_server_path)
+
 " Use mono to start the roslyn server on *nix
 let g:OmniSharp_server_use_mono = get(g:, 'OmniSharp_server_use_mono', 0)
 

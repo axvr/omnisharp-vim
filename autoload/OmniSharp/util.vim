@@ -48,6 +48,15 @@ function! OmniSharp#util#path_join(parts) abort
 endfunction
 
 function! OmniSharp#util#get_start_cmd(solution_file) abort
+  " Auto-install the OmniSharp server
+  if has('unix') && !filereadable(expand(g:OmniSharp_server_path))
+    if confirm("The OmniSharp server does not seem to be installed. Would you like to install it?",
+          \ "&Yes\n&No", 2, "Warning") == 1
+      call OmniSharp#Install()
+      redraw
+    endif
+  endif
+
   let solution_path = a:solution_file
   if fnamemodify(solution_path, ':t') ==? s:roslyn_server_files
     let solution_path = fnamemodify(solution_path, ':h')
@@ -70,16 +79,8 @@ function! OmniSharp#util#get_start_cmd(solution_file) abort
 
   let port = OmniSharp#GetPort(a:solution_file)
 
-  let s:server_path = ''
-  if !exists('g:OmniSharp_server_path')
-    let s:server_extension = has('win32') || has('win32unix') ? '.cmd' : ''
-    let s:server_path = OmniSharp#util#path_join(['omnisharp-roslyn', 'artifacts', 'scripts', 'OmniSharp' . s:server_extension])
-  else
-    let s:server_path = g:OmniSharp_server_path
-  endif
-
   let command = [
-              \ s:server_path,
+              \ g:OmniSharp_server_path,
               \ '-p', port,
               \ '-s', solution_path]
 
